@@ -1,0 +1,973 @@
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    min-height: 100vh;
+    padding-bottom: 60px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+}
+
+/* Back Button Styling */
+.back-button {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 8px 12px;
+    color: white;
+    font-family: 'Arial', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    z-index: 1001;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.back-button:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.back-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.back-arrow {
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.back-text {
+    font-size: 13px;
+    letter-spacing: 0.3px;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.header h1 {
+    font-size: 2.5rem;
+    margin: 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.header p {
+    font-size: 1.2rem;
+    margin: 10px 0;
+    opacity: 0.9;
+}
+
+.game-area {
+    display: flex;
+    gap: 30px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.level1-container {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 25px;
+    max-width: 600px;
+    width: 100%;
+}
+
+.level1-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.shape-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.grid-4x4 {
+    display: grid;
+    grid-template-columns: repeat(4, 30px);
+    grid-template-rows: repeat(4, 30px);
+    gap: 1px;
+    background: #333;
+    border: 2px solid #555;
+    margin-bottom: 15px;
+}
+
+.grid-cell {
+    background: #222;
+    border: 1px solid #444;
+}
+
+.grid-cell.filled {
+    background: #00ff88;
+    border: 1px solid #00cc66;
+}
+
+.input-section {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.input-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.input-group label {
+    font-weight: bold;
+}
+
+.input-group input {
+    width: 80px;
+    padding: 8px;
+    border: 2px solid #555;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    text-align: center;
+    font-size: 16px;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: #00ff88;
+}
+
+.feedback {
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    min-height: 25px;
+}
+
+.feedback.correct {
+    color: #00ff88;
+}
+
+.feedback.incorrect {
+    color: #ff4444;
+}
+
+.controls {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+}
+
+.btn-primary {
+    background: #00ff88;
+    color: #222;
+}
+
+.btn-primary:hover {
+    background: #00cc66;
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background: #ff6b6b;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #ff5252;
+    transform: translateY(-2px);
+}
+
+.btn-pause {
+    background: #ffa500;
+    color: white;
+}
+
+.btn-pause:hover {
+    background: #ff8c00;
+    transform: translateY(-2px);
+}
+
+.btn-pause.paused {
+    background: #32cd32;
+}
+
+.btn-pause.paused:hover {
+    background: #228b22;
+}
+
+.progress {
+    text-align: center;
+    font-size: 18px;
+    margin-bottom: 20px;
+    color: #00ff88;
+}
+
+.gameplay-container {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 25px;
+    display: none;
+}
+
+/* Updated game layout to include archery board */
+.game-layout {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    align-items: flex-start;
+    margin: 20px auto;
+    flex-wrap: wrap;
+}
+
+/* NEW: Archery Board Styling */
+.archery-container {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+    min-width: 180px;
+    display: none;
+    /* Hidden by default, shown in Level 2+ */
+}
+
+.archery-container.visible {
+    display: block;
+}
+
+.archery-container h3 {
+    margin: 0 0 15px 0;
+    color: #00ff88;
+    font-size: 16px;
+}
+
+.archery-board {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    margin: 0 auto 15px auto;
+    border-radius: 50%;
+    background: #1a1a1a;
+    border: 2px solid #555;
+}
+
+/* Archery rings */
+.archery-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 2px solid;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.ring-center {
+    width: 30px;
+    height: 30px;
+    background: rgba(255, 215, 0, 0.2);
+    border-color: #FFD700;
+}
+
+.ring-first {
+    width: 60px;
+    height: 60px;
+    background: transparent;
+    border-color: #FF4444;
+}
+
+.ring-second {
+    width: 90px;
+    height: 90px;
+    background: transparent;
+    border-color: #4444FF;
+}
+
+.ring-outer {
+    width: 120px;
+    height: 120px;
+    background: transparent;
+    border-color: #888888;
+}
+
+/* Archery crosshair marker */
+.archery-crosshair {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    display: none;
+    z-index: 10;
+}
+
+.archery-crosshair::before,
+.archery-crosshair::after {
+    content: '';
+    position: absolute;
+    background: currentColor;
+}
+
+.archery-crosshair::before {
+    width: 12px;
+    height: 2px;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+}
+
+.archery-crosshair::after {
+    width: 2px;
+    height: 12px;
+    left: 50%;
+    top: 0;
+    transform: translateX(-50%);
+}
+
+.crosshair-gold {
+    color: #FFD700;
+}
+
+.crosshair-red {
+    color: #FF4444;
+}
+
+.crosshair-blue {
+    color: #4444FF;
+}
+
+.crosshair-gray {
+    color: #888888;
+}
+
+/* NEW: Transparent colored hatches for each zone */
+.ring-center-hatch {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    background: rgba(255, 215, 0, 0.3);
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: none;
+    z-index: 5;
+}
+
+.ring-first-hatch {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    background: rgba(255, 68, 68, 0.3);
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: none;
+    z-index: 4;
+}
+
+.ring-second-hatch {
+    position: absolute;
+    width: 90px;
+    height: 90px;
+    background: rgba(68, 68, 255, 0.3);
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: none;
+    z-index: 3;
+}
+
+.ring-outer-hatch {
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    background: rgba(136, 136, 136, 0.3);
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: none;
+    z-index: 2;
+}
+
+/* Archery legend */
+.archery-legend {
+    font-size: 12px;
+    text-align: left;
+    margin-top: 10px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.legend-gold {
+    background: #FFD700;
+}
+
+.legend-red {
+    background: #FF4444;
+}
+
+.legend-blue {
+    background: #4444FF;
+}
+
+.legend-gray {
+    background: #888888;
+}
+
+.game-board-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+}
+
+.game-board {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(10, 30px);
+    grid-template-rows: repeat(20, 30px);
+    gap: 1px;
+    background: #333;
+    border: 3px solid #555;
+}
+
+.preview-container {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+    min-width: 140px;
+}
+
+.preview-container h3 {
+    margin: 0 0 15px 0;
+    color: #00ff88;
+    font-size: 16px;
+}
+
+.preview-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 25px);
+    grid-template-rows: repeat(4, 25px);
+    gap: 1px;
+    background: #333;
+    border: 2px solid #555;
+    margin: 0 auto;
+    width: fit-content;
+}
+
+.preview-cell {
+    background: #222;
+    border: 1px solid #444;
+    width: 25px;
+    height: 25px;
+}
+
+.preview-cell.filled {
+    border: 1px solid #444;
+}
+
+.board-cell {
+    background: #111;
+    border: 1px solid #333;
+    width: 30px;
+    height: 30px;
+}
+
+.board-cell.filled {
+    background: #00ff88;
+    border: 1px solid #00cc66;
+}
+
+.board-cell.falling {
+    background: #ffaa00;
+    border: 1px solid #ff8800;
+}
+
+.game-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.info-panel {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.info-panel h3 {
+    margin: 0 0 10px 0;
+    color: #00ff88;
+}
+
+.centroid-info {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.centroid-marker {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+}
+
+.centroid-overlay {
+    position: absolute;
+    z-index: 999;
+    pointer-events: none;
+}
+
+.marker-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.marker-magenta {
+    background: #ff00ff;
+}
+
+.marker-green {
+    background: #FFD600;
+}
+
+.game-controls {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.game-controls .btn {
+    margin: 5px;
+}
+
+.instructions {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 20px;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.instructions h4 {
+    color: #00ff88;
+    margin-top: 0;
+}
+
+.hidden {
+    display: none;
+}
+
+.pause-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    border-radius: 15px;
+}
+
+.pause-message {
+    background: rgba(255, 255, 255, 0.95);
+    color: #333;
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.pause-message h3 {
+    margin: 0 0 10px 0;
+    color: #ffa500;
+}
+
+.pause-message p {
+    margin: 5px 0;
+    font-size: 16px;
+    color: #666;
+}
+
+/* Celebration Animations */
+@keyframes celebrateTarget {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 rgba(255, 0, 255, 0.7);
+    }
+
+    30% {
+        transform: scale(2.5);
+        box-shadow: 0 0 20px rgba(255, 0, 255, 0.9);
+    }
+
+    60% {
+        transform: scale(2.2);
+        box-shadow: 0 0 30px rgba(255, 0, 255, 0.7);
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 0;
+        box-shadow: 0 0 40px rgba(255, 0, 255, 0);
+    }
+}
+
+@keyframes scorePopup {
+    0% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+    50% {
+        opacity: 1;
+        transform: translateY(-30px) scale(1.2);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(-60px) scale(0.8);
+    }
+}
+
+@keyframes scoreHighlight {
+    0% {
+        color: #ffffff;
+        transform: scale(1);
+    }
+
+    50% {
+        color: #FFD700;
+        transform: scale(1.3);
+        text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+    }
+
+    100% {
+        color: #ffffff;
+        transform: scale(1);
+        text-shadow: none;
+    }
+}
+
+/* NEW: Archery crosshair celebration animation */
+@keyframes archeryCelebrate {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: translate(-50%, -50%) scale(1.5);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0;
+    }
+}
+
+.target-celebrate {
+    animation: celebrateTarget 800ms ease-out forwards;
+}
+
+.score-popup {
+    position: absolute;
+    font-size: 24px;
+    font-weight: bold;
+    color: #FFD700;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    pointer-events: none;
+    z-index: 1001;
+    animation: scorePopup 600ms ease-out forwards;
+}
+
+.score-highlight {
+    animation: scoreHighlight 400ms ease-out;
+}
+
+.archery-celebrate {
+    animation: archeryCelebrate 1000ms ease-out forwards;
+}
+
+/* Footer Styling */
+.footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 12px 20px;
+    text-align: center;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+    z-index: 1000;
+    /* box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1); */
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    font-weight: 300;
+    letter-spacing: 0.5px;
+}
+
+.footer-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    margin-bottom: 8px;
+}
+
+body {
+    padding-bottom: 60px;
+}
+
+@media (max-width: 768px) {
+    .game-area {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .header h1 {
+        font-size: 2rem;
+    }
+
+    .input-section {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .game-layout {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    /* Stack archery board above game board on mobile */
+    .archery-container {
+        order: -1;
+        margin-bottom: 20px;
+    }
+
+    .archery-board {
+        width: 120px;
+        height: 120px;
+    }
+
+    .ring-center {
+        width: 24px;
+        height: 24px;
+    }
+
+    .ring-first {
+        width: 48px;
+        height: 48px;
+    }
+
+    .ring-second {
+        width: 72px;
+        height: 72px;
+    }
+
+    .ring-outer {
+        width: 96px;
+        height: 96px;
+    }
+
+    .footer {
+        padding: 10px 15px;
+        font-size: 12px;
+    }
+
+    body {
+        padding-bottom: 50px;
+    }
+
+    .back-button {
+        padding: 6px 10px;
+        font-size: 12px;
+        gap: 4px;
+    }
+
+    .back-arrow {
+        font-size: 14px;
+    }
+
+    .back-text {
+        font-size: 11px;
+    }
+}
+
+/* Modal Styling */
+.modal {
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(5px);
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-content {
+    background: linear-gradient(135deg, #2a2a72 0%, #009ffd 100%);
+    padding: 30px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.close-modal {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.close-modal:hover {
+    color: #fff;
+}
+
+.leaderboard-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    justify-content: center;
+}
+
+.tab-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    padding: 10px 20px;
+    color: white;
+    cursor: pointer;
+    border-radius: 20px;
+    transition: all 0.3s;
+    font-weight: bold;
+}
+
+.tab-btn.active,
+.tab-btn:hover {
+    background: #00ff88;
+    color: #222;
+}
+
+.leaderboard-list {
+    max-height: 300px;
+    overflow-y: auto;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.leaderboard-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 16px;
+}
+
+.leaderboard-item:last-child {
+    border-bottom: none;
+}
+
+.leaderboard-item .rank {
+    font-weight: bold;
+    color: #FFD700;
+    width: 30px;
+}
+
+.leaderboard-item .name {
+    flex-grow: 1;
+    text-align: left;
+}
+
+.leaderboard-item .score {
+    font-weight: bold;
+    color: #00ff88;
+}
+
+.loading {
+    text-align: center;
+    padding: 20px;
+    color: #aaa;
+}

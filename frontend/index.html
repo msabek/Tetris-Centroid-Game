@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Centroid Tetris - Learn Centroids Through Gameplay</title>
+</head>
+
+<body>
+  <div class="container">
+    <!-- Back Button -->
+    <button class="back-button" id="backButton">
+      <span class="back-arrow">←</span>
+      <span class="back-text">Back</span>
+    </button>
+
+    <div class="header">
+      <h1>🎯 Centroid Tetris</h1>
+      <p>Learn to calculate centroids through interactive gameplay!</p>
+      <button id="leaderboardBtn" class="btn btn-secondary" style="margin-top: 10px;">🏆 Leaderboard</button>
+    </div>
+
+    <!-- Leaderboard Modal -->
+    <div id="leaderboardModal" class="modal hidden">
+      <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <h2>🏆 Leaderboard</h2>
+        <div class="leaderboard-tabs">
+          <button class="tab-btn active" data-tab="top10">Top 10</button>
+          <button class="tab-btn" data-tab="top5">Top 5</button>
+          <button class="tab-btn" data-tab="personal">My Rank</button>
+        </div>
+        <div id="leaderboardList" class="leaderboard-list">
+          <!-- Scores will be populated here -->
+          <div class="loading">Loading...</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="game-area">
+      <!-- Level 1: Manual Centroid Identification -->
+      <div class="level1-container" id="level1">
+        <div class="level1-header">
+          <h2>Level 1: Identify the Centroid</h2>
+          <div class="progress" id="progress">Shape 1 of 7</div>
+        </div>
+
+        <div class="shape-display">
+          <h3 id="shapeTitle">I-Tetromino</h3>
+          <div class="grid-4x4" id="shapeGrid"></div>
+        </div>
+
+        <div class="input-section">
+          <div class="input-group">
+            <label for="centroidX">X:</label>
+            <input type="number" id="centroidX" step="0.1" placeholder="0.0">
+          </div>
+          <div class="input-group">
+            <label for="centroidY">Y:</label>
+            <input type="number" id="centroidY" step="0.1" placeholder="0.0">
+          </div>
+        </div>
+
+        <div class="feedback" id="feedback"></div>
+
+        <div class="controls">
+          <button class="btn btn-primary" id="nextShape">Next Shape</button>
+          <button class="btn btn-secondary" id="skipToLevel2">Skip to Level 2</button>
+        </div>
+
+        <div class="instructions">
+          <h4>Instructions:</h4>
+          <p>Calculate the centroid (center point) of each Tetris piece. The centroid is the average position of all
+            squares.</p>
+        </div>
+      </div>
+
+      <!-- Level 2+: Interactive Gameplay -->
+      <div class="gameplay-container" id="gameplay">
+        <div class="game-info">
+          <div class="info-panel">
+            <h3>Level</h3>
+            <div id="currentLevel">2</div>
+          </div>
+          <div class="info-panel">
+            <h3>Score</h3>
+            <div id="score">0</div>
+          </div>
+          <div class="info-panel">
+            <h3>Target</h3>
+            <div id="targetInfo">Move to (5.0, 1.0)</div>
+          </div>
+        </div>
+
+        <div class="centroid-info">
+          <div class="centroid-marker">
+            <div class="marker-dot" style="background: #00BFFF;"></div>
+            <span>Current Piece Centroid</span>
+          </div>
+          <div class="centroid-marker">
+            <div class="marker-dot marker-magenta"></div>
+            <span>Target Centroid</span>
+          </div>
+          <div class="centroid-marker">
+            <div class="marker-dot marker-green"></div>
+            <span>Locked Pieces Centroid</span>
+            <span id="lockedCentroidInfo" style="margin-left: 10px; color: #FFD600; font-weight: bold;"></span>
+          </div>
+        </div>
+
+        <!-- Updated game layout with archery board -->
+        <div class="game-layout">
+          <!-- NEW: Archery Board Container -->
+          <div class="archery-container" id="archeryContainer">
+            <h3>🎯 Accuracy</h3>
+            <div class="archery-board" id="archeryBoard">
+              <div class="archery-ring ring-outer"></div>
+              <div class="archery-ring ring-second"></div>
+              <div class="archery-ring ring-first"></div>
+              <div class="archery-ring ring-center"></div>
+
+              <!-- NEW: Colored hatches for flashing -->
+              <div class="ring-outer-hatch" id="outerHatch"></div>
+              <div class="ring-second-hatch" id="secondHatch"></div>
+              <div class="ring-first-hatch" id="firstHatch"></div>
+              <div class="ring-center-hatch" id="centerHatch"></div>
+
+              <div class="archery-crosshair" id="archeryCrosshair"></div>
+            </div>
+            <div class="archery-legend">
+              <div class="legend-item">
+                <div class="legend-color legend-gold"></div>
+                <span>Perfect (0-0.1)</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color legend-red"></div>
+                <span>Good (0.1-0.2)</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color legend-blue"></div>
+                <span>OK (0.2-0.3)</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color legend-gray"></div>
+                <span>Miss (&gt;0.3)</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="game-board-container">
+            <div class="game-board" id="gameBoard"></div>
+          </div>
+
+          <div class="preview-container">
+            <h3>Upcoming</h3>
+            <div class="preview-grid" id="previewGrid"></div>
+          </div>
+        </div>
+
+        <div class="game-controls">
+          <button class="btn btn-primary" id="moveLeft">← Left</button>
+          <button class="btn btn-primary" id="moveRight">Right →</button>
+          <button class="btn btn-primary" id="rotateBtn">↻ Rotate</button>
+          <button class="btn btn-primary" id="dropBtn">↓ Drop</button>
+          <button class="btn btn-pause" id="pauseBtn">⏸ Pause</button>
+          <button class="btn btn-secondary" id="resetGame">Reset Game</button>
+        </div>
+
+        <div class="instructions">
+          <h4>Gameplay Instructions:</h4>
+          <p><strong>Goal:</strong> Place pieces so the overall centroid of all locked pieces matches the target
+            centroid shown as a magenta square.</p>
+          <p><strong>Visual Guide:</strong> Blue crosshair shows your current piece's centroid, magenta square marks the
+            target, and yellow crosshair shows locked pieces' centroid.</p>
+          <p><strong>Archery Board:</strong> Shows your accuracy when hitting targets. Closer to center = higher
+            accuracy bonus!</p>
+          <p><strong>Controls:</strong> Use arrow keys or buttons to move pieces. Press Space to drop quickly. Press P
+            to pause/resume.</p>
+          <p><strong>Scoring:</strong> Score = (208 - squares used) ÷ 2 + (0.3 - distance) × 100 + 70. Use fewer pieces
+            and be more accurate for higher scores!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-divider"></div>
+    <div class="footer-content">
+      Designed by Dr. Ahmed Mowafy • © 2025
+    </div>
+  </footer>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,2157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centroid Tetris - Learn Centroids Through Gameplay</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        /* Back Button Styling */
+        .back-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: white;
+            font-family: 'Arial', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            z-index: 1001;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .back-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        }
+
+        .back-arrow {
+            font-size: 16px;
+            font-weight: bold;
+            line-height: 1;
+        }
+
+        .back-text {
+            font-size: 13px;
+            letter-spacing: 0.3px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            margin: 10px 0;
+            opacity: 0.9;
+        }
+
+        .game-area {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .level1-container {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .level1-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .shape-display {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .grid-4x4 {
+            display: grid;
+            grid-template-columns: repeat(4, 30px);
+            grid-template-rows: repeat(4, 30px);
+            gap: 1px;
+            background: #333;
+            border: 2px solid #555;
+            margin-bottom: 15px;
+        }
+
+        .grid-cell {
+            background: #222;
+            border: 1px solid #444;
+        }
+
+        .grid-cell.filled {
+            background: #00ff88;
+            border: 1px solid #00cc66;
+        }
+
+        .input-section {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .input-group label {
+            font-weight: bold;
+        }
+
+        .input-group input {
+            width: 80px;
+            padding: 8px;
+            border: 2px solid #555;
+            border-radius: 5px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #00ff88;
+        }
+
+        .feedback {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            min-height: 25px;
+        }
+
+        .feedback.correct {
+            color: #00ff88;
+        }
+
+        .feedback.incorrect {
+            color: #ff4444;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .btn-primary {
+            background: #00ff88;
+            color: #222;
+        }
+
+        .btn-primary:hover {
+            background: #00cc66;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #ff5252;
+            transform: translateY(-2px);
+        }
+
+        .btn-pause {
+            background: #ffa500;
+            color: white;
+        }
+
+        .btn-pause:hover {
+            background: #ff8c00;
+            transform: translateY(-2px);
+        }
+
+        .btn-pause.paused {
+            background: #32cd32;
+        }
+
+        .btn-pause.paused:hover {
+            background: #228b22;
+        }
+
+        .progress {
+            text-align: center;
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #00ff88;
+        }
+
+        .gameplay-container {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            display: none;
+        }
+
+        /* Updated game layout to include archery board */
+        .game-layout {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            align-items: flex-start;
+            margin: 20px auto;
+            flex-wrap: wrap;
+        }
+
+        /* NEW: Archery Board Styling */
+        .archery-container {
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            min-width: 180px;
+            display: none; /* Hidden by default, shown in Level 2+ */
+        }
+
+        .archery-container.visible {
+            display: block;
+        }
+
+        .archery-container h3 {
+            margin: 0 0 15px 0;
+            color: #00ff88;
+            font-size: 16px;
+        }
+
+        .archery-board {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 15px auto;
+            border-radius: 50%;
+            background: #1a1a1a;
+            border: 2px solid #555;
+        }
+
+        /* Archery rings */
+        .archery-ring {
+            position: absolute;
+            border-radius: 50%;
+            border: 2px solid;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .ring-center {
+            width: 30px;
+            height: 30px;
+            background: rgba(255, 215, 0, 0.2);
+            border-color: #FFD700;
+        }
+
+        .ring-first {
+            width: 60px;
+            height: 60px;
+            background: transparent;
+            border-color: #FF4444;
+        }
+
+        .ring-second {
+            width: 90px;
+            height: 90px;
+            background: transparent;
+            border-color: #4444FF;
+        }
+
+        .ring-outer {
+            width: 120px;
+            height: 120px;
+            background: transparent;
+            border-color: #888888;
+        }
+
+        /* Archery crosshair marker */
+        .archery-crosshair {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            display: none;
+            z-index: 10;
+        }
+
+        .archery-crosshair::before,
+        .archery-crosshair::after {
+            content: '';
+            position: absolute;
+            background: currentColor;
+        }
+
+        .archery-crosshair::before {
+            width: 12px;
+            height: 2px;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+        }
+
+        .archery-crosshair::after {
+            width: 2px;
+            height: 12px;
+            left: 50%;
+            top: 0;
+            transform: translateX(-50%);
+        }
+
+        .crosshair-gold { color: #FFD700; }
+        .crosshair-red { color: #FF4444; }
+        .crosshair-blue { color: #4444FF; }
+        .crosshair-gray { color: #888888; }
+
+        /* NEW: Transparent colored hatches for each zone */
+        .ring-center-hatch {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: rgba(255, 215, 0, 0.3);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+            z-index: 5;
+        }
+
+        .ring-first-hatch {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 68, 68, 0.3);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+            z-index: 4;
+        }
+
+        .ring-second-hatch {
+            position: absolute;
+            width: 90px;
+            height: 90px;
+            background: rgba(68, 68, 255, 0.3);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+            z-index: 3;
+        }
+
+        .ring-outer-hatch {
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            background: rgba(136, 136, 136, 0.3);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+            z-index: 2;
+        }
+
+        /* Archery legend */
+        .archery-legend {
+            font-size: 12px;
+            text-align: left;
+            margin-top: 10px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .legend-gold { background: #FFD700; }
+        .legend-red { background: #FF4444; }
+        .legend-blue { background: #4444FF; }
+        .legend-gray { background: #888888; }
+
+        .game-board-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+        }
+
+        .game-board {
+            position: relative;
+            display: grid;
+            grid-template-columns: repeat(10, 30px);
+            grid-template-rows: repeat(20, 30px);
+            gap: 1px;
+            background: #333;
+            border: 3px solid #555;
+        }
+
+        .preview-container {
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            min-width: 140px;
+        }
+
+        .preview-container h3 {
+            margin: 0 0 15px 0;
+            color: #00ff88;
+            font-size: 16px;
+        }
+
+        .preview-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 25px);
+            grid-template-rows: repeat(4, 25px);
+            gap: 1px;
+            background: #333;
+            border: 2px solid #555;
+            margin: 0 auto;
+            width: fit-content;
+        }
+
+        .preview-cell {
+            background: #222;
+            border: 1px solid #444;
+            width: 25px;
+            height: 25px;
+        }
+
+        .preview-cell.filled {
+            border: 1px solid #444;
+        }
+
+        .board-cell {
+            background: #111;
+            border: 1px solid #333;
+            width: 30px;
+            height: 30px;
+        }
+
+        .board-cell.filled {
+            background: #00ff88;
+            border: 1px solid #00cc66;
+        }
+
+        .board-cell.falling {
+            background: #ffaa00;
+            border: 1px solid #ff8800;
+        }
+
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .info-panel {
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .info-panel h3 {
+            margin: 0 0 10px 0;
+            color: #00ff88;
+        }
+
+        .centroid-info {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .centroid-marker {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .centroid-overlay {
+            position: absolute;
+            z-index: 999;
+            pointer-events: none;
+        }
+
+        .marker-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .marker-magenta { background: #ff00ff; }
+        .marker-green { background: #FFD600; }
+
+        .game-controls {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .game-controls .btn {
+            margin: 5px;
+        }
+
+        .instructions {
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .instructions h4 {
+            color: #00ff88;
+            margin-top: 0;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .pause-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            border-radius: 15px;
+        }
+
+        .pause-message {
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .pause-message h3 {
+            margin: 0 0 10px 0;
+            color: #ffa500;
+        }
+
+        .pause-message p {
+            margin: 5px 0;
+            font-size: 16px;
+            color: #666;
+        }
+
+        /* Celebration Animations */
+        @keyframes celebrateTarget {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 rgba(255, 0, 255, 0.7);
+            }
+            30% {
+                transform: scale(2.5);
+                box-shadow: 0 0 20px rgba(255, 0, 255, 0.9);
+            }
+            60% {
+                transform: scale(2.2);
+                box-shadow: 0 0 30px rgba(255, 0, 255, 0.7);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 0;
+                box-shadow: 0 0 40px rgba(255, 0, 255, 0);
+            }
+        }
+
+        @keyframes scorePopup {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            50% {
+                opacity: 1;
+                transform: translateY(-30px) scale(1.2);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-60px) scale(0.8);
+            }
+        }
+
+        @keyframes scoreHighlight {
+            0% {
+                color: #ffffff;
+                transform: scale(1);
+            }
+            50% {
+                color: #FFD700;
+                transform: scale(1.3);
+                text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+            }
+            100% {
+                color: #ffffff;
+                transform: scale(1);
+                text-shadow: none;
+            }
+        }
+
+        /* NEW: Archery crosshair celebration animation */
+        @keyframes archeryCelebrate {
+            0% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.5);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0;
+            }
+        }
+
+        .target-celebrate {
+            animation: celebrateTarget 800ms ease-out forwards;
+        }
+
+        .score-popup {
+            position: absolute;
+            font-size: 24px;
+            font-weight: bold;
+            color: #FFD700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            pointer-events: none;
+            z-index: 1001;
+            animation: scorePopup 600ms ease-out forwards;
+        }
+
+        .score-highlight {
+            animation: scoreHighlight 400ms ease-out;
+        }
+
+        .archery-celebrate {
+            animation: archeryCelebrate 1000ms ease-out forwards;
+        }
+
+        /* Footer Styling */
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px 20px;
+            text-align: center;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+            z-index: 1000;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+        }
+
+        .footer-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            margin-bottom: 8px;
+        }
+
+        body {
+            padding-bottom: 60px;
+        }
+
+        @media (max-width: 768px) {
+            .game-area {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .input-section {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .game-layout {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            /* Stack archery board above game board on mobile */
+            .archery-container {
+                order: -1;
+                margin-bottom: 20px;
+            }
+
+            .archery-board {
+                width: 120px;
+                height: 120px;
+            }
+
+            .ring-center { width: 24px; height: 24px; }
+            .ring-first { width: 48px; height: 48px; }
+            .ring-second { width: 72px; height: 72px; }
+            .ring-outer { width: 96px; height: 96px; }
+
+            .footer {
+                padding: 10px 15px;
+                font-size: 12px;
+            }
+
+            body {
+                padding-bottom: 50px;
+            }
+
+            .back-button {
+                padding: 6px 10px;
+                font-size: 12px;
+                gap: 4px;
+            }
+
+            .back-arrow {
+                font-size: 14px;
+            }
+
+            .back-text {
+                font-size: 11px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Back Button -->
+        <button class="back-button" id="backButton">
+            <span class="back-arrow">←</span>
+            <span class="back-text">Back</span>
+        </button>
+
+        <div class="header">
+            <h1>🎯 Centroid Tetris</h1>
+            <p>Learn to calculate centroids through interactive gameplay!</p>
+        </div>
+
+        <div class="game-area">
+            <!-- Level 1: Manual Centroid Identification -->
+            <div class="level1-container" id="level1">
+                <div class="level1-header">
+                    <h2>Level 1: Identify the Centroid</h2>
+                    <div class="progress" id="progress">Shape 1 of 7</div>
+                </div>
+
+                <div class="shape-display">
+                    <h3 id="shapeTitle">I-Tetromino</h3>
+                    <div class="grid-4x4" id="shapeGrid"></div>
+                </div>
+
+                <div class="input-section">
+                    <div class="input-group">
+                        <label for="centroidX">X:</label>
+                        <input type="number" id="centroidX" step="0.1" placeholder="0.0">
+                    </div>
+                    <div class="input-group">
+                        <label for="centroidY">Y:</label>
+                        <input type="number" id="centroidY" step="0.1" placeholder="0.0">
+                    </div>
+                </div>
+
+                <div class="feedback" id="feedback"></div>
+
+                <div class="controls">
+                    <button class="btn btn-primary" id="nextShape">Next Shape</button>
+                    <button class="btn btn-secondary" id="skipToLevel2">Skip to Level 2</button>
+                </div>
+
+                <div class="instructions">
+                    <h4>Instructions:</h4>
+                    <p>Calculate the centroid (center point) of each Tetris piece. The centroid is the average position of all squares.</p>
+                </div>
+            </div>
+
+            <!-- Level 2+: Interactive Gameplay -->
+            <div class="gameplay-container" id="gameplay">
+                <div class="game-info">
+                    <div class="info-panel">
+                        <h3>Level</h3>
+                        <div id="currentLevel">2</div>
+                    </div>
+                    <div class="info-panel">
+                        <h3>Score</h3>
+                        <div id="score">0</div>
+                    </div>
+                    <div class="info-panel">
+                        <h3>Target</h3>
+                        <div id="targetInfo">Move to (5.0, 1.0)</div>
+                    </div>
+                </div>
+
+                <div class="centroid-info">
+                    <div class="centroid-marker">
+                        <div class="marker-dot" style="background: #00BFFF;"></div>
+                        <span>Current Piece Centroid</span>
+                    </div>
+                    <div class="centroid-marker">
+                        <div class="marker-dot marker-magenta"></div>
+                        <span>Target Centroid</span>
+                    </div>
+                    <div class="centroid-marker">
+                        <div class="marker-dot marker-green"></div>
+                        <span>Locked Pieces Centroid</span>
+                        <span id="lockedCentroidInfo" style="margin-left: 10px; color: #FFD600; font-weight: bold;"></span>
+                    </div>
+                </div>
+
+                <!-- Updated game layout with archery board -->
+                <div class="game-layout">
+                    <!-- NEW: Archery Board Container -->
+                    <div class="archery-container" id="archeryContainer">
+                        <h3>🎯 Accuracy</h3>
+                        <div class="archery-board" id="archeryBoard">
+                            <div class="archery-ring ring-outer"></div>
+                            <div class="archery-ring ring-second"></div>
+                            <div class="archery-ring ring-first"></div>
+                            <div class="archery-ring ring-center"></div>
+                            
+                            <!-- NEW: Colored hatches for flashing -->
+                            <div class="ring-outer-hatch" id="outerHatch"></div>
+                            <div class="ring-second-hatch" id="secondHatch"></div>
+                            <div class="ring-first-hatch" id="firstHatch"></div>
+                            <div class="ring-center-hatch" id="centerHatch"></div>
+                            
+                            <div class="archery-crosshair" id="archeryCrosshair"></div>
+                        </div>
+                        <div class="archery-legend">
+                            <div class="legend-item">
+                                <div class="legend-color legend-gold"></div>
+                                <span>Perfect (0-0.1)</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color legend-red"></div>
+                                <span>Good (0.1-0.2)</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color legend-blue"></div>
+                                <span>OK (0.2-0.3)</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color legend-gray"></div>
+                                <span>Miss (&gt;0.3)</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="game-board-container">
+                        <div class="game-board" id="gameBoard"></div>
+                    </div>
+                    
+                    <div class="preview-container">
+                        <h3>Upcoming</h3>
+                        <div class="preview-grid" id="previewGrid"></div>
+                    </div>
+                </div>
+
+                <div class="game-controls">
+                    <button class="btn btn-primary" id="moveLeft">← Left</button>
+                    <button class="btn btn-primary" id="moveRight">Right →</button>
+                    <button class="btn btn-primary" id="rotateBtn">↻ Rotate</button>
+                    <button class="btn btn-primary" id="dropBtn">↓ Drop</button>
+                    <button class="btn btn-pause" id="pauseBtn">⏸ Pause</button>
+                    <button class="btn btn-secondary" id="resetGame">Reset Game</button>
+                </div>
+
+                <div class="instructions">
+                    <h4>Gameplay Instructions:</h4>
+                    <p><strong>Goal:</strong> Place pieces so the overall centroid of all locked pieces matches the target centroid shown as a magenta square.</p>
+                    <p><strong>Visual Guide:</strong> Blue crosshair shows your current piece's centroid, magenta square marks the target, and yellow crosshair shows locked pieces' centroid.</p>
+                    <p><strong>Archery Board:</strong> Shows your accuracy when hitting targets. Closer to center = higher accuracy bonus!</p>
+                    <p><strong>Controls:</strong> Use arrow keys or buttons to move pieces. Press Space to drop quickly. Press P to pause/resume.</p>
+                    <p><strong>Scoring:</strong> Score = (208 - squares used) ÷ 2 + (0.3 - distance) × 100 + 70. Use fewer pieces and be more accurate for higher scores!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-divider"></div>
+        <div class="footer-content">
+            Designed by Dr. Ahmed Mowafy • © 2025
+        </div>
+    </footer>
+
+    <script>
+        class CentroidTetris {
+            constructor() {
+                this.currentMode = 'level1';
+                this.level1Progress = 0;
+                this.currentLevel = 2;
+                this.score = 0;
+                this.gameRunning = false;
+                this.isPaused = false;
+                this.isCelebrating = false;
+                
+                this.highestLevelReached = 2;
+                this.scoreAtLevelStart = 0;
+                
+                this.boardWidth = 10;
+                this.boardHeight = 20;
+                this.board = this.createEmptyBoard();
+                
+                this.currentPiece = null;
+                this.currentPiecePos = { x: 0, y: 0 };
+                this.upcomingPiece = null;
+                this.currentTargetScore = 0;
+                
+                this.levelTargets = {
+                    2: [[5, 1], [5, 2], [5, 3], [5, 4], [5, 5]],
+                    3: [[3, 2], [7, 2], [5, 4], [5, 6], [5, 8]],
+                    4: [[2, 3], [8, 3], [5, 6], [3, 8], [7, 8]],
+                    5: [[4, 2], [6, 2], [5, 5], [3, 7], [7, 7]],
+                    6: [[5, 3], [3, 5], [7, 5], [5, 8], [5, 9]],
+                    7: [[4, 4], [6, 4], [5, 7], [3, 9], [7, 9]],
+                    8: [[5, 5], [3, 3], [7, 3], [5, 8], [5, 9]]
+                };
+                this.currentTargetIndex = 0;
+                
+                this.dropTimer = null;
+                this.dropInterval = 1000;
+                
+                this.tetrominoes = {
+                    I: {
+                        name: 'I-Tetromino',
+                        shapes: [
+                            [[0,0], [1,0], [2,0], [3,0]],
+                            [[0,0], [0,1], [0,2], [0,3]]
+                        ],
+                        color: '#00ffff'
+                    },
+                    O: {
+                        name: 'O-Tetromino',
+                        shapes: [
+                            [[0,0], [1,0], [0,1], [1,1]]
+                        ],
+                        color: '#ffff00'
+                    },
+                    T: {
+                        name: 'T-Tetromino',
+                        shapes: [
+                            [[1,0], [0,1], [1,1], [2,1]],
+                            [[0,0], [0,1], [1,1], [0,2]],
+                            [[0,0], [1,0], [2,0], [1,1]],
+                            [[1,0], [0,1], [1,1], [1,2]]
+                        ],
+                        color: '#800080'
+                    },
+                    S: {
+                        name: 'S-Tetromino',
+                        shapes: [
+                            [[1,0], [2,0], [0,1], [1,1]],
+                            [[0,0], [0,1], [1,1], [1,2]]
+                        ],
+                        color: '#00ff00'
+                    },
+                    Z: {
+                        name: 'Z-Tetromino',
+                        shapes: [
+                            [[0,0], [1,0], [1,1], [2,1]],
+                            [[1,0], [0,1], [1,1], [0,2]]
+                        ],
+                        color: '#ff0000'
+                    },
+                    J: {
+                        name: 'J-Tetromino',
+                        shapes: [
+                            [[0,0], [0,1], [1,1], [2,1]],
+                            [[1,0], [1,1], [0,2], [1,2]],
+                            [[0,0], [1,0], [2,0], [2,1]],
+                            [[0,0], [1,0], [0,1], [0,2]]
+                        ],
+                        color: '#0000ff'
+                    },
+                    L: {
+                        name: 'L-Tetromino',
+                        shapes: [
+                            [[2,0], [0,1], [1,1], [2,1]],
+                            [[0,0], [0,1], [0,2], [1,2]],
+                            [[0,0], [1,0], [2,0], [0,1]],
+                            [[0,0], [1,0], [1,1], [1,2]]
+                        ],
+                        color: '#ffa500'
+                    }
+                };
+                
+                this.level1Sequence = ['I', 'O', 'T', 'S', 'Z', 'J', 'L'];
+                
+                this.validateTargets();
+                this.initializeGame();
+                this.bindEvents();
+            }
+            
+            validateTargets() {
+                for (const level in this.levelTargets) {
+                    this.levelTargets[level] = this.levelTargets[level].map(target => 
+                        this.clampTarget(target)
+                    );
+                }
+            }
+
+            createEmptyBoard() {
+                return Array(this.boardHeight).fill().map(() => Array(this.boardWidth).fill(0));
+            }
+            
+            initializeGame() {
+                this.initializeLevel1();
+                this.initializeGameplay();
+                this.showLevel1();
+            }
+            
+            initializeLevel1() {
+                this.displayLevel1Shape();
+            }
+            
+            displayLevel1Shape() {
+                const shapeKey = this.level1Sequence[this.level1Progress];
+                const shape = this.tetrominoes[shapeKey];
+                const shapeCoords = shape.shapes[0];
+                
+                document.getElementById('shapeTitle').textContent = shape.name;
+                document.getElementById('progress').textContent = `Shape ${this.level1Progress + 1} of ${this.level1Sequence.length}`;
+                
+                const grid = document.getElementById('shapeGrid');
+                grid.innerHTML = '';
+                
+                for (let y = 3; y >= 0; y--) {
+                    for (let x = 0; x < 4; x++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'grid-cell';
+                        
+                        const hasBlock = shapeCoords.some(([sx, sy]) => sx === x && sy === y);
+                        if (hasBlock) {
+                            cell.classList.add('filled');
+                        }
+                        
+                        grid.appendChild(cell);
+                    }
+                }
+                
+                document.getElementById('centroidX').value = '';
+                document.getElementById('centroidY').value = '';
+                document.getElementById('feedback').textContent = '';
+                document.getElementById('feedback').className = 'feedback';
+            }
+            
+            calculateCentroid(coordinates) {
+                if (coordinates.length === 0) return { x: 0, y: 0 };
+                
+                const sumX = coordinates.reduce((sum, [x, y]) => sum + x, 0);
+                const sumY = coordinates.reduce((sum, [x, y]) => sum + y, 0);
+                
+                return {
+                    x: (sumX / coordinates.length) + 0.5,
+                    y: (sumY / coordinates.length) + 0.5
+                };
+            }
+            
+            checkLevel1Answer() {
+                const userXValue = document.getElementById('centroidX').value.trim();
+                const userYValue = document.getElementById('centroidY').value.trim();
+                
+                if (!userXValue || !userYValue) {
+                    document.getElementById('feedback').textContent = '';
+                    document.getElementById('feedback').className = 'feedback';
+                    return false;
+                }
+                
+                const userX = parseFloat(userXValue);
+                const userY = parseFloat(userYValue);
+                
+                if (isNaN(userX) || isNaN(userY)) {
+                    document.getElementById('feedback').textContent = '';
+                    document.getElementById('feedback').className = 'feedback';
+                    return false;
+                }
+                
+                const shapeKey = this.level1Sequence[this.level1Progress];
+                const shapeCoords = this.tetrominoes[shapeKey].shapes[0];
+                const correctCentroid = this.calculateCentroid(shapeCoords);
+                
+                const tolerance = 0.1;
+                const isCorrect = Math.abs(userX - correctCentroid.x) <= tolerance && 
+                                Math.abs(userY - correctCentroid.y) <= tolerance;
+                
+                const feedback = document.getElementById('feedback');
+                if (isCorrect) {
+                    feedback.textContent = `Correct! Centroid is (${correctCentroid.x.toFixed(1)}, ${correctCentroid.y.toFixed(1)})`;
+                    feedback.className = 'feedback correct';
+                    return true;
+                } else {
+                    feedback.textContent = `Incorrect. Try again! Expected: (${correctCentroid.x.toFixed(1)}, ${correctCentroid.y.toFixed(1)})`;
+                    feedback.className = 'feedback incorrect';
+                    return false;
+                }
+            }
+            
+            nextLevel1Shape() {
+                if (this.checkLevel1Answer()) {
+                    this.level1Progress++;
+                    if (this.level1Progress >= this.level1Sequence.length) {
+                        this.startGameplay();
+                    } else {
+                        this.displayLevel1Shape();
+                    }
+                }
+            }
+            
+            initializeGameplay() {
+                this.createGameBoard();
+                this.createPreviewGrid();
+            }
+            
+            createGameBoard() {
+                const board = document.getElementById('gameBoard');
+                board.innerHTML = '';
+                
+                for (let y = this.boardHeight - 1; y >= 0; y--) {
+                    for (let x = 0; x < this.boardWidth; x++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'board-cell';
+                        cell.dataset.x = x;
+                        cell.dataset.y = y;
+                        board.appendChild(cell);
+                    }
+                }
+            }
+
+            createPreviewGrid() {
+                const grid = document.getElementById('previewGrid');
+                grid.innerHTML = '';
+                
+                for (let y = 3; y >= 0; y--) {
+                    for (let x = 0; x < 4; x++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'preview-cell';
+                        cell.dataset.x = x;
+                        cell.dataset.y = y;
+                        grid.appendChild(cell);
+                    }
+                }
+            }
+            
+            getAvailableShapes() {
+                const shapeKeys = ['I'];
+                if (this.currentLevel >= 3) shapeKeys.push('O');
+                if (this.currentLevel >= 4) shapeKeys.push('T');
+                if (this.currentLevel >= 5) shapeKeys.push('S');
+                if (this.currentLevel >= 6) shapeKeys.push('Z');
+                if (this.currentLevel >= 7) shapeKeys.push('J');
+                if (this.currentLevel >= 8) shapeKeys.push('L');
+                return shapeKeys;
+            }
+
+            generateUpcomingPiece() {
+                const availableShapes = this.getAvailableShapes();
+                const randomShape = availableShapes[Math.floor(Math.random() * availableShapes.length)];
+                this.upcomingPiece = randomShape;
+                this.updateUpcomingPreview();
+            }
+
+            updateUpcomingPreview() {
+                if (!this.upcomingPiece) return;
+                
+                const cells = document.querySelectorAll('.preview-cell');
+                cells.forEach(cell => {
+                    cell.className = 'preview-cell';
+                    cell.style.backgroundColor = '';
+                });
+                
+                const shape = this.tetrominoes[this.upcomingPiece];
+                const coords = shape.shapes[0];
+                const color = shape.color;
+                
+                coords.forEach(([x, y]) => {
+                    const cell = document.querySelector(`.preview-cell[data-x="${x}"][data-y="${y}"]`);
+                    if (cell) {
+                        cell.classList.add('filled');
+                        cell.style.backgroundColor = color;
+                    }
+                });
+            }
+            
+            spawnNewPiece() {
+                let pieceType;
+                if (this.upcomingPiece) {
+                    pieceType = this.upcomingPiece;
+                } else {
+                    const availableShapes = this.getAvailableShapes();
+                    pieceType = availableShapes[Math.floor(Math.random() * availableShapes.length)];
+                }
+                
+                this.currentPiece = {
+                    type: pieceType,
+                    rotation: 0,
+                    color: this.tetrominoes[pieceType].color
+                };
+                
+                this.currentPiecePos = {
+                    x: Math.floor(this.boardWidth / 2) - 1,
+                    y: this.boardHeight - 1
+                };
+                
+                if (this.checkCollision(this.currentPiece, this.currentPiecePos)) {
+                    this.gameOver();
+                    return false;
+                }
+                
+                this.generateUpcomingPiece();
+                this.startDropTimer();
+                return true;
+            }
+            
+            getCurrentPieceCoords() {
+                if (!this.currentPiece) return [];
+                
+                const shape = this.tetrominoes[this.currentPiece.type];
+                const coords = shape.shapes[this.currentPiece.rotation];
+                
+                return coords.map(([x, y]) => [
+                    x + this.currentPiecePos.x,
+                    y + this.currentPiecePos.y
+                ]);
+            }
+            
+            checkCollision(piece, pos) {
+                const shape = this.tetrominoes[piece.type];
+                const coords = shape.shapes[piece.rotation];
+                
+                for (const [x, y] of coords) {
+                    const newX = x + pos.x;
+                    const newY = y + pos.y;
+                    
+                    if (newX < 0 || newX >= this.boardWidth || newY < 0) {
+                        return true;
+                    }
+                    
+                    if (newY < this.boardHeight && this.board[newY][newX] !== 0) {
+                        return true;
+                    }
+                }
+                
+                return false;
+            }
+            
+            lockPiece() {
+                const coords = this.getCurrentPieceCoords();
+                
+                for (const [x, y] of coords) {
+                    if (y >= 0 && y < this.boardHeight && x >= 0 && x < this.boardWidth) {
+                        this.board[y][x] = 1;
+                    }
+                }
+                
+                this.currentPiece = null;
+                this.stopDropTimer();
+                this.checkTargetMatch();
+            }
+            
+            checkTargetMatch() {
+                const lockedCoords = this.getLockedPieceCoords();
+                if (lockedCoords.length === 0) return;
+                
+                const currentCentroid = this.calculateCentroid(lockedCoords);
+                const target = this.getCurrentTarget();
+                
+                // Calculate Euclidean distance (tolerance)
+                const tolerance = Math.sqrt(
+                    Math.pow(currentCentroid.x - target[0], 2) + 
+                    Math.pow(currentCentroid.y - target[1], 2)
+                );
+                
+                const maxTolerance = 0.3;
+                const matches = tolerance <= maxTolerance;
+                
+                if (matches) {
+                    // NEW SCORING FORMULA: (208 - squares) / 2 + (0.3 - tolerance) * 100 + 70
+                    const lockedSquares = lockedCoords.length;
+                    const accuracyBonus = (maxTolerance - tolerance) * 100;
+                    this.currentTargetScore = Math.round((208 - lockedSquares) / 2 + accuracyBonus + 70);
+                    
+                    // Store tolerance for archery board display
+                    this.currentTolerance = tolerance;
+                    
+                    this.celebrateTargetMatch();
+                }
+            }
+            
+            celebrateTargetMatch() {
+                this.isCelebrating = true;
+                this.stopDropTimer();
+                
+                this.updateDisplay();
+                
+                this.animateTargetMarker();
+                this.showScorePopup();
+                this.animateScoreCounter();
+                
+                // NEW: Show archery board crosshair
+                this.showArcheryCrosshair();
+                
+                setTimeout(() => {
+                    this.completeCelebration();
+                }, 1000);
+            }
+            
+            // NEW: Universal flashing function for any element
+            flashElement(element, totalFlashes = 3, flashSpeed = 300) {
+                let flashCount = 0;
+                
+                const doFlash = () => {
+                    if (flashCount >= totalFlashes) {
+                        element.style.opacity = '1';
+                        return;
+                    }
+                    
+                    // Completely disappear
+                    element.style.opacity = '0';
+                    
+                    setTimeout(() => {
+                        // Completely appear
+                        element.style.opacity = '1';
+                        flashCount++;
+                        
+                        setTimeout(doFlash, flashSpeed);
+                    }, flashSpeed);
+                };
+                
+                doFlash();
+            }
+            
+            // NEW: Master flashing function for target hits
+            flashTargetHit(distance) {
+                const crosshair = document.getElementById('archeryCrosshair');
+                const scorePopup = document.querySelector('.score-popup');
+                const scoreCounter = document.getElementById('score');
+                
+                // Determine which ring and hatch to flash
+                let ring, hatch;
+                if (distance <= 0.1) {
+                    ring = document.querySelector('.ring-center');
+                    hatch = document.getElementById('centerHatch');
+                } else if (distance <= 0.2) {
+                    ring = document.querySelector('.ring-first');
+                    hatch = document.getElementById('firstHatch');
+                } else if (distance <= 0.3) {
+                    ring = document.querySelector('.ring-second');
+                    hatch = document.getElementById('secondHatch');
+                } else {
+                    ring = document.querySelector('.ring-outer');
+                    hatch = document.getElementById('outerHatch');
+                }
+                
+                // Show the hatch
+                if (hatch) hatch.style.display = 'block';
+                
+                // Flash all elements at the same speed (300ms)
+                if (crosshair) this.flashElement(crosshair, 3, 300);
+                if (ring) this.flashElement(ring, 3, 300);
+                if (hatch) this.flashElement(hatch, 3, 300);
+                if (scorePopup) this.flashElement(scorePopup, 3, 300);
+                if (scoreCounter) this.flashElement(scoreCounter, 3, 300);
+                
+                // Hide hatch after flashing is done (3 flashes × 600ms = 1800ms + buffer)
+                setTimeout(() => {
+                    if (hatch) {
+                        hatch.style.display = 'none';
+                        hatch.style.opacity = '1'; // Reset for next time
+                    }
+                }, 2000);
+            }
+            
+            // NEW: Show crosshair on archery board
+            showArcheryCrosshair() {
+                if (this.currentLevel < 2) return; // Only show in Level 2+
+                
+                const lockedCoords = this.getLockedPieceCoords();
+                if (lockedCoords.length === 0) return;
+                
+                const currentCentroid = this.calculateCentroid(lockedCoords);
+                const target = this.getCurrentTarget();
+                
+                // Use the stored tolerance from the scoring calculation
+                const distance = this.currentTolerance;
+                
+                // Calculate error vector for direction
+                const errorX = currentCentroid.x - target[0];
+                const errorY = currentCentroid.y - target[1];
+                const angle = Math.atan2(errorY, errorX);
+                
+                // Map distance to archery board (max radius = 60px for outer ring)
+                const maxRadius = 60; // Half of ring-outer diameter (120px)
+                const mappedDistance = Math.min(distance * (maxRadius / 0.4), maxRadius); // Scale distance
+                
+                // Convert polar to cartesian coordinates
+                const centerX = 75; // Center of 150px board
+                const centerY = 75;
+                const crosshairX = centerX + mappedDistance * Math.cos(angle);
+                const crosshairY = centerY - mappedDistance * Math.sin(angle); // Invert Y for screen coordinates
+                
+                // Determine color based on distance (using exact thresholds)
+                let colorClass;
+                if (distance <= 0.1) {
+                    colorClass = 'crosshair-gold';
+                } else if (distance <= 0.2) {
+                    colorClass = 'crosshair-red';
+                } else if (distance <= 0.3) {
+                    colorClass = 'crosshair-blue';
+                } else {
+                    colorClass = 'crosshair-gray';
+                }
+                
+                // Position and show the crosshair
+                const crosshair = document.getElementById('archeryCrosshair');
+                crosshair.className = `archery-crosshair ${colorClass}`;
+                crosshair.style.left = `${crosshairX - 6}px`; // Center the 12px crosshair
+                crosshair.style.top = `${crosshairY - 6}px`;
+                crosshair.style.display = 'block';
+                
+                // Start the comprehensive flashing sequence
+                this.flashTargetHit(distance);
+            }
+            
+            animateTargetMarker() {
+                const targetMarkers = document.querySelectorAll('.centroid-overlay');
+                targetMarkers.forEach(marker => {
+                    if (marker.style.border && marker.style.border.includes('#FF00FF')) {
+                        marker.classList.add('target-celebrate');
+                    }
+                });
+            }
+            
+            showScorePopup() {
+                const target = this.getCurrentTarget();
+                const popup = document.createElement('div');
+                popup.className = 'score-popup';
+                
+                // Show detailed score breakdown
+                const lockedSquares = this.getLockedPieceCoords().length;
+                const accuracyBonus = Math.round((0.3 - this.currentTolerance) * 100);
+                const efficiency = Math.round((208 - lockedSquares) / 2);
+                
+                popup.innerHTML = `
+                    <div style="font-size: 24px; color: #FFD700; font-weight: bold;">+${this.currentTargetScore}</div>
+                    <div style="font-size: 12px; margin-top: 4px; color: #ffffff; opacity: 0.9;">
+                        Efficiency: ${efficiency} | Accuracy: ${accuracyBonus} | Base: 70
+                    </div>
+                    <div style="font-size: 11px; color: #ffffff; opacity: 0.7;">
+                        Distance: ${this.currentTolerance.toFixed(3)}
+                    </div>
+                `;
+                
+                const cellSize = 30;
+                const gapSize = 1;
+                const x = target[0] * (cellSize + gapSize) - gapSize;
+                const y = (this.boardHeight - target[1]) * (cellSize + gapSize) - gapSize;
+                
+                popup.style.left = `${x - 40}px`;
+                popup.style.top = `${y - 60}px`;
+                popup.style.textAlign = 'center';
+                popup.style.whiteSpace = 'nowrap';
+                
+                const board = document.getElementById('gameBoard');
+                board.appendChild(popup);
+                
+                setTimeout(() => {
+                    if (popup.parentNode) {
+                        popup.parentNode.removeChild(popup);
+                    }
+                }, 3000); // Extended to 3 seconds for better celebration
+            }
+            
+            animateScoreCounter() {
+                const scoreElement = document.getElementById('score');
+                if (scoreElement) {
+                    scoreElement.classList.add('score-highlight');
+                    
+                    setTimeout(() => {
+                        scoreElement.classList.remove('score-highlight');
+                    }, 400);
+                }
+            }
+            
+            completeCelebration() {
+                this.score += this.currentTargetScore;
+                this.currentTargetIndex++;
+                
+                this.board = this.createEmptyBoard();
+                
+                if (this.currentTargetIndex >= this.levelTargets[this.currentLevel].length) {
+                    this.advanceLevel();
+                }
+                
+                document.querySelectorAll('.target-celebrate').forEach(marker => {
+                    marker.classList.remove('target-celebrate');
+                });
+                
+                // Hide archery crosshair and clean up animations
+                const crosshair = document.getElementById('archeryCrosshair');
+                crosshair.style.display = 'none';
+                crosshair.style.opacity = '1'; // Reset opacity
+                crosshair.classList.remove('archery-celebrate');
+                
+                // Reset opacity for all rings and hide all hatches
+                document.querySelectorAll('.archery-ring').forEach(ring => {
+                    ring.style.opacity = '1';
+                });
+                
+                // Hide and reset all hatches
+                document.querySelectorAll('[id$="Hatch"]').forEach(hatch => {
+                    hatch.style.display = 'none';
+                    hatch.style.opacity = '1';
+                });
+                
+                this.isCelebrating = false;
+                this.updateDisplay();
+                this.spawnNewPiece();
+            }
+            
+            getCurrentTarget() {
+                const targets = this.levelTargets[this.currentLevel];
+                const target = targets[this.currentTargetIndex] || targets[0];
+                return this.clampTarget(target);
+            }
+
+            clampTarget(target) {
+                if (!target || target.length < 2) return [5, 1];
+                return [target[0], Math.min(target[1], 9)];
+            }
+            
+            advanceLevel() {
+                this.currentLevel++;
+                this.currentTargetIndex = 0;
+                
+                if (this.currentLevel > 8) {
+                    this.victory();
+                    return;
+                }
+                
+                if (this.currentLevel > this.highestLevelReached) {
+                    this.highestLevelReached = this.currentLevel;
+                    this.scoreAtLevelStart = this.score;
+                }
+                
+                if (this.upcomingPiece) {
+                    const availableShapes = this.getAvailableShapes();
+                    if (!availableShapes.includes(this.upcomingPiece)) {
+                        this.generateUpcomingPiece();
+                    }
+                }
+                
+                document.getElementById('currentLevel').textContent = this.currentLevel;
+                this.updateArcheryBoardVisibility();
+            }
+            
+            // NEW: Show/hide archery board based on level
+            updateArcheryBoardVisibility() {
+                const archeryContainer = document.getElementById('archeryContainer');
+                if (this.currentLevel >= 2 && this.currentMode === 'gameplay') {
+                    archeryContainer.classList.add('visible');
+                } else {
+                    archeryContainer.classList.remove('visible');
+                }
+            }
+            
+            getLockedPieceCoords() {
+                const coords = [];
+                for (let y = 0; y < this.boardHeight; y++) {
+                    for (let x = 0; x < this.boardWidth; x++) {
+                        if (this.board[y][x] !== 0) {
+                            coords.push([x, y]);
+                        }
+                    }
+                }
+                return coords;
+            }
+            
+            movePiece(dx, dy) {
+                if (!this.currentPiece || this.isPaused || this.isCelebrating) return false;
+                
+                const newPos = {
+                    x: this.currentPiecePos.x + dx,
+                    y: this.currentPiecePos.y + dy
+                };
+                
+                if (!this.checkCollision(this.currentPiece, newPos)) {
+                    this.currentPiecePos = newPos;
+                    this.updateDisplay();
+                    return true;
+                }
+                
+                if (dy < 0) {
+                    this.lockPiece();
+                    this.spawnNewPiece();
+                }
+                
+                return false;
+            }
+            
+            rotatePiece() {
+                if (!this.currentPiece || this.isPaused || this.isCelebrating) return;
+                
+                const shape = this.tetrominoes[this.currentPiece.type];
+                const newRotation = (this.currentPiece.rotation + 1) % shape.shapes.length;
+                
+                const testPiece = { ...this.currentPiece, rotation: newRotation };
+                
+                if (!this.checkCollision(testPiece, this.currentPiecePos)) {
+                    this.currentPiece.rotation = newRotation;
+                    this.updateDisplay();
+                }
+            }
+            
+            dropPiece() {
+                if (!this.currentPiece || this.isPaused || this.isCelebrating) return;
+                
+                while (this.movePiece(0, -1)) {
+                    // Keep dropping until collision
+                }
+            }
+            
+            togglePause() {
+                if (this.currentMode !== 'gameplay' || !this.gameRunning) return;
+                
+                this.isPaused = !this.isPaused;
+                
+                const pauseBtn = document.getElementById('pauseBtn');
+                const pauseOverlay = document.getElementById('pauseOverlay');
+                
+                if (!pauseBtn || !pauseOverlay) return;
+                
+                if (this.isPaused) {
+                    this.stopDropTimer();
+                    pauseBtn.textContent = '▶ Resume';
+                    pauseBtn.classList.add('paused');
+                    pauseOverlay.classList.remove('hidden');
+                } else {
+                    if (this.currentPiece) {
+                        this.startDropTimer();
+                    }
+                    pauseBtn.textContent = '⏸ Pause';
+                    pauseBtn.classList.remove('paused');
+                    pauseOverlay.classList.add('hidden');
+                }
+            }
+            
+            startDropTimer() {
+                this.stopDropTimer();
+                this.dropTimer = setInterval(() => {
+                    this.movePiece(0, -1);
+                }, this.dropInterval);
+            }
+            
+            stopDropTimer() {
+                if (this.dropTimer) {
+                    clearInterval(this.dropTimer);
+                    this.dropTimer = null;
+                }
+            }
+            
+            updateDisplay() {
+                this.clearBoard();
+                this.drawLockedPieces();
+                this.drawCurrentPiece();
+                this.drawCentroids();
+                this.updateGameInfo();
+            }
+            
+            clearBoard() {
+                const cells = document.querySelectorAll('.board-cell');
+                cells.forEach(cell => {
+                    cell.className = 'board-cell';
+                });
+            }
+            
+            drawLockedPieces() {
+                for (let y = 0; y < this.boardHeight; y++) {
+                    for (let x = 0; x < this.boardWidth; x++) {
+                        if (this.board[y][x] !== 0) {
+                            const cell = document.querySelector(`[data-x="${x}"][data-y="${y}"]`);
+                            if (cell) {
+                                cell.classList.add('filled');
+                            }
+                        }
+                    }
+                }
+            }
+            
+            drawCurrentPiece() {
+                if (!this.currentPiece) return;
+                
+                const coords = this.getCurrentPieceCoords();
+                coords.forEach(([x, y]) => {
+                    if (x >= 0 && x < this.boardWidth && y >= 0 && y < this.boardHeight) {
+                        const cell = document.querySelector(`[data-x="${x}"][data-y="${y}"]`);
+                        if (cell) {
+                            cell.classList.add('falling');
+                        }
+                    }
+                });
+            }
+            
+            drawCentroids() {
+                document.querySelectorAll('.centroid-overlay').forEach(el => el.remove());
+                
+                if (this.currentPiece) {
+                    const currentCoords = this.getCurrentPieceCoords();
+                    const currentCentroid = this.calculateCentroid(currentCoords);
+                    this.drawCentroidMarker(currentCentroid, 'current');
+                }
+                
+                const lockedCoords = this.getLockedPieceCoords();
+                if (lockedCoords.length > 0) {
+                    const lockedCentroid = this.calculateCentroid(lockedCoords);
+                    this.drawCentroidMarker(lockedCentroid, 'locked');
+                }
+                
+                const target = this.getCurrentTarget();
+                this.drawCentroidMarker({ x: target[0], y: target[1] }, 'target');
+            }
+            
+            drawCentroidMarker(centroid, markerType) {
+                const marker = document.createElement('div');
+                marker.className = 'centroid-overlay';
+                
+                const cellSize = 30;
+                const gapSize = 1;
+                const borderSize = 3;
+                
+                const x = centroid.x * (cellSize + gapSize) - gapSize;
+                const y = (this.boardHeight - centroid.y) * (cellSize + gapSize) - gapSize;
+                
+                let markerSize, markerStyles;
+                
+                switch(markerType) {
+                    case 'current':
+                        markerSize = 16;
+                        markerStyles = {
+                            width: '16px',
+                            height: '16px',
+                            background: 'transparent',
+                            border: '2px solid #00BFFF'
+                        };
+                        break;
+                        
+                    case 'target':
+                        markerSize = 20;
+                        markerStyles = {
+                            width: '20px',
+                            height: '20px',
+                            background: 'rgba(255, 0, 255, 0.3)',
+                            border: '2px solid #FF00FF'
+                        };
+                        break;
+                        
+                    case 'locked':
+                        markerSize = 16;
+                        markerStyles = {
+                            width: '16px',
+                            height: '16px',
+                            background: 'transparent',
+                            border: '2px solid #FFD600'
+                        };
+                        break;
+                        
+                    default:
+                        markerSize = 16;
+                        markerStyles = {
+                            width: '16px',
+                            height: '16px',
+                            background: 'transparent',
+                            border: '2px solid #FFFFFF'
+                        };
+                }
+                
+                marker.style.left = `${x - markerSize/2}px`;
+                marker.style.top = `${y - markerSize/2}px`;
+                Object.assign(marker.style, markerStyles);
+                
+                const hLine = document.createElement('div');
+                hLine.style.cssText = `
+                    position: absolute;
+                    left: 50%; top: 50%;
+                    width: ${markerSize - 4}px; height: 2px;
+                    background: ${markerType === 'current' ? '#00BFFF' : markerType === 'target' ? '#FF00FF' : markerType === 'locked' ? '#FFD600' : '#FFFFFF'};
+                    transform: translate(-50%, -50%);
+                `;
+                marker.appendChild(hLine);
+                
+                const vLine = document.createElement('div');
+                vLine.style.cssText = `
+                    position: absolute;
+                    left: 50%; top: 50%;
+                    width: 2px; height: ${markerSize - 4}px;
+                    background: ${markerType === 'current' ? '#00BFFF' : markerType === 'target' ? '#FF00FF' : markerType === 'locked' ? '#FFD600' : '#FFFFFF'};
+                    transform: translate(-50%, -50%);
+                `;
+                marker.appendChild(vLine);
+                
+                const board = document.getElementById('gameBoard');
+                board.appendChild(marker);
+            }
+            
+            updateGameInfo() {
+                document.getElementById('score').textContent = this.score;
+                document.getElementById('currentLevel').textContent = this.currentLevel;
+                
+                const target = this.getCurrentTarget();
+                document.getElementById('targetInfo').textContent = `Move to (${target[0].toFixed(1)}, ${target[1].toFixed(1)})`;
+                
+                const lockedCoords = this.getLockedPieceCoords();
+                const lockedInfoElement = document.getElementById('lockedCentroidInfo');
+                if (lockedCoords.length > 0) {
+                    const lockedCentroid = this.calculateCentroid(lockedCoords);
+                    lockedInfoElement.textContent = `at (${lockedCentroid.x.toFixed(1)}, ${lockedCentroid.y.toFixed(1)})`;
+                } else {
+                    lockedInfoElement.textContent = 'No pieces';
+                }
+            }
+            
+            startGameplay() {
+                this.showGameplay();
+                this.gameRunning = true;
+                this.isPaused = false;
+                this.isCelebrating = false;
+                this.board = this.createEmptyBoard();
+                this.score = 0;
+                this.currentLevel = 2;
+                this.currentTargetIndex = 0;
+                this.upcomingPiece = null;
+                this.currentTargetScore = 0;
+                
+                this.highestLevelReached = 2;
+                this.scoreAtLevelStart = 0;
+                
+                const pauseBtn = document.getElementById('pauseBtn');
+                const pauseOverlay = document.getElementById('pauseOverlay');
+                if (pauseBtn) {
+                    pauseBtn.textContent = '⏸ Pause';
+                    pauseBtn.classList.remove('paused');
+                }
+                if (pauseOverlay) {
+                    pauseOverlay.classList.add('hidden');
+                }
+                
+                // Hide archery crosshair
+                const crosshair = document.getElementById('archeryCrosshair');
+                crosshair.style.display = 'none';
+                crosshair.style.opacity = '1'; // Reset opacity
+                crosshair.classList.remove('archery-celebrate');
+                
+                // Reset opacity for all rings and hide all hatches
+                document.querySelectorAll('.archery-ring').forEach(ring => {
+                    ring.style.opacity = '1';
+                });
+                
+                // Hide and reset all hatches
+                document.querySelectorAll('[id$="Hatch"]').forEach(hatch => {
+                    hatch.style.display = 'none';
+                    hatch.style.opacity = '1';
+                });
+                
+                this.updateArcheryBoardVisibility();
+                this.updateDisplay();
+                this.generateUpcomingPiece();
+                this.spawnNewPiece();
+            }
+            
+            resetGame() {
+                this.stopDropTimer();
+                this.gameRunning = true;
+                this.isPaused = false;
+                this.isCelebrating = false;
+                this.board = this.createEmptyBoard();
+                this.currentPiece = null;
+                this.upcomingPiece = null;
+                this.currentTargetScore = 0;
+                
+                this.currentLevel = this.highestLevelReached;
+                this.score = this.scoreAtLevelStart;
+                this.currentTargetIndex = 0;
+                
+                document.querySelectorAll('.centroid-overlay').forEach(el => el.remove());
+                document.querySelectorAll('.score-popup').forEach(el => el.remove());
+                document.querySelectorAll('.target-celebrate').forEach(el => {
+                    el.classList.remove('target-celebrate');
+                });
+                
+                const pauseBtn = document.getElementById('pauseBtn');
+                const pauseOverlay = document.getElementById('pauseOverlay');
+                if (pauseBtn) {
+                    pauseBtn.textContent = '⏸ Pause';
+                    pauseBtn.classList.remove('paused');
+                }
+                if (pauseOverlay) {
+                    pauseOverlay.classList.add('hidden');
+                }
+                
+                // Hide archery crosshair
+                const crosshair = document.getElementById('archeryCrosshair');
+                crosshair.style.display = 'none';
+                crosshair.style.opacity = '1'; // Reset opacity
+                crosshair.classList.remove('archery-celebrate');
+                
+                // Reset opacity for all rings and hide all hatches
+                document.querySelectorAll('.archery-ring').forEach(ring => {
+                    ring.style.opacity = '1';
+                });
+                
+                // Hide and reset all hatches
+                document.querySelectorAll('[id$="Hatch"]').forEach(hatch => {
+                    hatch.style.display = 'none';
+                    hatch.style.opacity = '1';
+                });
+                
+                this.updateDisplay();
+                this.generateUpcomingPiece();
+                this.spawnNewPiece();
+            }
+            
+            gameOver() {
+                this.stopDropTimer();
+                this.gameRunning = false;
+                alert(`Game Over! Final Score: ${this.score}`);
+            }
+            
+            victory() {
+                this.stopDropTimer();
+                this.gameRunning = false;
+                alert(`🎉 Congratulations! You've completed all levels! Final Score: ${this.score}`);
+            }
+            
+            showLevel1() {
+                document.getElementById('level1').style.display = 'block';
+                document.getElementById('gameplay').style.display = 'none';
+                this.currentMode = 'level1';
+                this.updateArcheryBoardVisibility();
+            }
+            
+            showGameplay() {
+                document.getElementById('level1').style.display = 'none';
+                document.getElementById('gameplay').style.display = 'block';
+                this.currentMode = 'gameplay';
+                this.updateArcheryBoardVisibility();
+            }
+
+            returnToStart() {
+                this.stopDropTimer();
+                this.gameRunning = false;
+                this.isPaused = false;
+                this.isCelebrating = false;
+                
+                this.currentMode = 'level1';
+                this.level1Progress = 0;
+                this.currentLevel = 2;
+                this.score = 0;
+                this.board = this.createEmptyBoard();
+                this.currentPiece = null;
+                this.upcomingPiece = null;
+                this.currentTargetIndex = 0;
+                this.highestLevelReached = 2;
+                this.scoreAtLevelStart = 0;
+                this.currentTargetScore = 0;
+                
+                document.querySelectorAll('.centroid-overlay').forEach(el => el.remove());
+                document.querySelectorAll('.score-popup').forEach(el => el.remove());
+                document.querySelectorAll('.target-celebrate').forEach(el => {
+                    el.classList.remove('target-celebrate');
+                });
+                
+                const pauseBtn = document.getElementById('pauseBtn');
+                const pauseOverlay = document.getElementById('pauseOverlay');
+                if (pauseBtn) {
+                    pauseBtn.textContent = '⏸ Pause';
+                    pauseBtn.classList.remove('paused');
+                }
+                if (pauseOverlay) {
+                    pauseOverlay.classList.add('hidden');
+                }
+                
+                // Hide archery crosshair
+                const crosshair = document.getElementById('archeryCrosshair');
+                crosshair.style.display = 'none';
+                crosshair.style.opacity = '1'; // Reset opacity
+                crosshair.classList.remove('archery-celebrate');
+                
+                // Reset opacity for all rings and hide all hatches
+                document.querySelectorAll('.archery-ring').forEach(ring => {
+                    ring.style.opacity = '1';
+                });
+                
+                // Hide and reset all hatches
+                document.querySelectorAll('[id$="Hatch"]').forEach(hatch => {
+                    hatch.style.display = 'none';
+                    hatch.style.opacity = '1';
+                });
+                
+                this.showLevel1();
+                this.displayLevel1Shape();
+            }
+            
+            bindEvents() {
+                document.getElementById('backButton').addEventListener('click', () => this.returnToStart());
+                
+                document.getElementById('nextShape').addEventListener('click', () => this.nextLevel1Shape());
+                document.getElementById('skipToLevel2').addEventListener('click', () => this.startGameplay());
+                
+                document.getElementById('centroidX').addEventListener('input', () => this.checkLevel1Answer());
+                document.getElementById('centroidY').addEventListener('input', () => this.checkLevel1Answer());
+                
+                document.getElementById('moveLeft').addEventListener('click', () => this.movePiece(-1, 0));
+                document.getElementById('moveRight').addEventListener('click', () => this.movePiece(1, 0));
+                document.getElementById('rotateBtn').addEventListener('click', () => this.rotatePiece());
+                document.getElementById('dropBtn').addEventListener('click', () => this.dropPiece());
+                
+                const pauseBtn = document.getElementById('pauseBtn');
+                if (pauseBtn) {
+                    pauseBtn.addEventListener('click', () => this.togglePause());
+                }
+                
+                document.getElementById('resetGame').addEventListener('click', () => this.resetGame());
+                
+                document.addEventListener('keydown', (e) => {
+                    if (this.currentMode !== 'gameplay' || !this.gameRunning) return;
+                    
+                    if (e.key.toLowerCase() === 'p' && !this.isCelebrating) {
+                        e.preventDefault();
+                        this.togglePause();
+                        return;
+                    }
+                    
+                    if (this.isPaused || this.isCelebrating) return;
+                    
+                    switch(e.key) {
+                        case 'ArrowLeft':
+                            e.preventDefault();
+                            this.movePiece(-1, 0);
+                            break;
+                        case 'ArrowRight':
+                            e.preventDefault();
+                            this.movePiece(1, 0);
+                            break;
+                        case 'ArrowDown':
+                            e.preventDefault();
+                            this.movePiece(0, -1);
+                            break;
+                        case 'ArrowUp':
+                            e.preventDefault();
+                            this.rotatePiece();
+                            break;
+                        case ' ':
+                            e.preventDefault();
+                            this.dropPiece();
+                            break;
+                    }
+                });
+            }
+        }
+        
+        const game = new CentroidTetris();
+    </script>
+</body>
+</html>
